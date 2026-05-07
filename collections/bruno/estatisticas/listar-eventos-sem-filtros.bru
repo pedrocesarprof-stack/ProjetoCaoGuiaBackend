@@ -1,0 +1,18 @@
+meta {
+  name: Listar Eventos sem filtros
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/estatisticas/eventos
+  body: none
+  auth: none
+}
+
+params:query {
+  page: 0
+  size: 10
+  sort: criadoEm,desc
+}
+

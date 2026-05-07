@@ -1,0 +1,24 @@
+meta {
+  name: Atualizar Noticia
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/api/noticias/{{noticiaId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "titulo": "Titulo atualizado",
+    "conteudo": "Conteudo atualizado da noticia...",
+    "resumo": "Resumo atualizado",
+    "autor": "Pedro",
+    "categoria": "TECNOLOGIA",
+    "status": "PUBLICADO",
+    "tags": "tecnologia, inovacao",
+    "imagemUrl": "https://exemplo.com/nova-imagem.jpg"
+  }
+}

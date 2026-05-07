@@ -1,0 +1,20 @@
+meta {
+  name: Registrar Visualizacao
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/estatisticas/eventos
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "noticiaId": 1,
+    "usuarioId": "usuario-123",
+    "tipoEvento": "VISUALIZACAO",
+    "origem": "app"
+  }
+}

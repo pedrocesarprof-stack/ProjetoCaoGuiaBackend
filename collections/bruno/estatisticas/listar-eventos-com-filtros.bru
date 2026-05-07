@@ -1,0 +1,21 @@
+meta {
+  name: Listar Eventos com filtros
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/estatisticas/eventos
+  body: none
+  auth: none
+}
+
+params:query {
+  noticiaId: 1
+  usuarioId: usuario-123
+  tipoEvento: LIKE
+  page: 0
+  size: 10
+  sort: criadoEm,desc
+}
+

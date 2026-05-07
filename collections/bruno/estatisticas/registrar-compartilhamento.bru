@@ -1,0 +1,20 @@
+meta {
+  name: Registrar Compartilhamento
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/estatisticas/eventos
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "noticiaId": 1,
+    "usuarioId": "usuario-123",
+    "tipoEvento": "COMPARTILHAMENTO",
+    "origem": "web"
+  }
+}
