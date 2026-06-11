@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "com/ifgoiano/urt/projetocaoguia/projetocaoguiabackend/usuarios")
+@Table(name = "usuarios")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,4 +24,9 @@ public class Usuario {
 
     @Column(nullable = false)
     private String senha;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private PerfilUsuario perfil = PerfilUsuario.USER;
 }

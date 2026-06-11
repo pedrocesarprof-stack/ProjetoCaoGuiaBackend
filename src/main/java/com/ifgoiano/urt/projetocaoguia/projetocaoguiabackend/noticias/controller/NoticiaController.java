@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,7 @@ public class NoticiaController {
 
     @PostMapping
     @Operation(summary = "Cadastrar notícia")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<NoticiaResponseDTO> criar(
             @Valid @RequestBody NoticiaRequestDTO dto) {
 
@@ -50,6 +52,7 @@ public class NoticiaController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar notícia")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<NoticiaResponseDTO> atualizar(
             @PathVariable Long id,
             @Valid @RequestBody NoticiaRequestDTO dto) {
@@ -59,6 +62,7 @@ public class NoticiaController {
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Atualizar status da notícia")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<NoticiaResponseDTO> atualizarStatus(
             @PathVariable Long id,
 
@@ -70,6 +74,7 @@ public class NoticiaController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Remover notícia")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletar(
             @PathVariable Long id) {
 

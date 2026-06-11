@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +35,7 @@ public class TreinamentoController {
 
     @PostMapping
     @Operation(summary = "Cadastrar treinamento")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TreinamentoResponseDTO> criar(
             @Valid @RequestBody TreinamentoRequestDTO dto) {
 
@@ -84,6 +86,7 @@ public class TreinamentoController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar treinamento")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TreinamentoResponseDTO> atualizar(
             @PathVariable Long id,
             @Valid @RequestBody TreinamentoRequestDTO dto) {
@@ -93,6 +96,7 @@ public class TreinamentoController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Remover treinamento")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> remover(
             @PathVariable Long id) {
 

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +32,7 @@ public class EstatisticaController {
 
     @PostMapping("/eventos")
     @Operation(summary = "Registrar evento manualmente")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<EstatisticaEventoResponseDTO> registrarEvento(
             @Valid @RequestBody EstatisticaEventoRequestDTO dto) {
 
@@ -42,6 +44,7 @@ public class EstatisticaController {
             summary = "Listar eventos",
             description = "Retorna uma lista paginada de eventos com filtros opcionais"
     )
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<EstatisticaEventoResponseDTO>> listarEventos(
 
             @Parameter(description = "Filtrar por ID da entidade")
@@ -66,6 +69,7 @@ public class EstatisticaController {
             summary = "Resumo de estatísticas por entidade",
             description = "Retorna o resumo de todos os eventos registrados para uma entidade específica"
     )
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EstatisticaResumoDTO> resumoPorEntidade(
             @Parameter(description = "Tipo da entidade (NOTICIA, DEPOIMENTO, TREINAMENTO, FORMULARIO, USUARIO)")
             @PathVariable TipoEntidade tipoEntidade,
