@@ -1,5 +1,6 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model;
 
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.UsuarioSimplificadoDTO;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,7 +12,7 @@ public class EstatisticaEventoResponseDTO {
     private Long id;
     private Long entidadeId;
     private TipoEntidade tipoEntidade;
-    private String usuarioId;
+    private UsuarioSimplificadoDTO usuario;
     private TipoEventoEstatistica tipoEvento;
     private String origem;
     private LocalDateTime criadoEm;
@@ -21,7 +22,7 @@ public class EstatisticaEventoResponseDTO {
                 .id(evento.getId())
                 .entidadeId(evento.getEntidadeId())
                 .tipoEntidade(evento.getTipoEntidade())
-                .usuarioId(evento.getUsuarioId())
+                .usuario(UsuarioSimplificadoDTO.from(evento.getUsuario()))
                 .tipoEvento(evento.getTipoEvento())
                 .origem(evento.getOrigem())
                 .criadoEm(evento.getCriadoEm())

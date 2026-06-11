@@ -1,5 +1,6 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model;
 
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,8 +26,9 @@ public class EstatisticaEvento {
     @Column(nullable = false, length = 30)
     private TipoEntidade tipoEntidade;
 
-    @Column(length = 120)
-    private String usuarioId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)

@@ -1,5 +1,7 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.formularios.service;
 
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.core.EntityNotFoundException;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.core.security.AuthenticationFacade;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEntidade;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEventoEstatistica;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.service.EstatisticaService;
@@ -20,15 +22,21 @@ public class FormularioService {
 
     private final FormularioRepository formularioRepository;
     private final EstatisticaService estatisticaService;
+    private final AuthenticationFacade authenticationFacade;
 
     public FormularioResponseDTO salvarFormulario(FormularioRequestDTO dto) {
         if (dto.resposta() == null || dto.resposta().isBlank()) {
             throw new RuntimeException("O conteúdo do formulário não pode estar vazio!");
         }
 
-        Formulario formulario = new Formulario();
-        formulario.setDataEnvio(LocalDateTime.now());
-        formulario.setResposta(dto.resposta().trim());
+        var usuarioLogado = authenticationFacade.getAuthenticatedUserOrNull();
+
+        Formulario formulario = Formulario.builder()
+                .dataEnvio(LocalDateTime.now())
+                .resposta(dto.resposta().trim())
+                .criadoPor(usuarioLogado)
+                .atualizadoPor(usuarioLogado)
+                .build();
 
         Formulario salvo = formularioRepository.save(formulario);
         estatisticaService.registrarEventoInterno(salvo.getId(), TipoEntidade.FORMULARIO, TipoEventoEstatistica.CRIACAO);
@@ -43,7 +51,7 @@ public class FormularioService {
 
     public FormularioResponseDTO buscarPorId(Long id) {
         Formulario formulario = formularioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Formulário não encontrado com o ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Formulário", id));
         estatisticaService.registrarEventoInterno(id, TipoEntidade.FORMULARIO, TipoEventoEstatistica.VISUALIZACAO);
         return new FormularioResponseDTO(formulario);
     }
@@ -53,10 +61,14 @@ public class FormularioService {
             throw new RuntimeException("O conteúdo da resposta não pode estar vazio!");
         }
 
+        var usuarioLogado = authenticationFacade.getAuthenticatedUserOrNull();
+
         Formulario formulario = formularioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Formulário não encontrado com o ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Formulário", id));
 
         formulario.setResposta(dto.resposta().trim());
+        formulario.setAtualizadoPor(usuarioLogado);
+
         Formulario atualizado = formularioRepository.save(formulario);
         estatisticaService.registrarEventoInterno(id, TipoEntidade.FORMULARIO, TipoEventoEstatistica.ATUALIZACAO);
         return new FormularioResponseDTO(atualizado);
@@ -64,7 +76,7 @@ public class FormularioService {
 
     public void deletarFormulario(Long id) {
         Formulario formulario = formularioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Formulário não encontrado com o ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Formulário", id));
         formularioRepository.delete(formulario);
         estatisticaService.registrarEventoInterno(id, TipoEntidade.FORMULARIO, TipoEventoEstatistica.EXCLUSAO);
     }

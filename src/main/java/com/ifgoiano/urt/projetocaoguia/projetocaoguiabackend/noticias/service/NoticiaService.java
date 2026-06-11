@@ -1,6 +1,7 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.noticias.service;
 
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.core.NoticiaNotFoundException;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.core.security.AuthenticationFacade;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEntidade;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEventoEstatistica;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.service.EstatisticaService;
@@ -20,9 +21,12 @@ public class NoticiaService {
 
     private final NoticiaRepository repository;
     private final EstatisticaService estatisticaService;
+    private final AuthenticationFacade authenticationFacade;
 
     @Transactional
     public NoticiaResponseDTO criar(NoticiaRequestDTO dto) {
+        var usuarioLogado = authenticationFacade.getAuthenticatedUser();
+
         var noticia = Noticia.builder()
                 .titulo(dto.getTitulo())
                 .conteudo(dto.getConteudo())
@@ -32,7 +36,16 @@ public class NoticiaService {
                 .status(dto.getStatus() != null ? dto.getStatus() : StatusNoticia.RASCUNHO)
                 .tags(dto.getTags())
                 .imagemUrl(dto.getImagemUrl())
+                .criadoPor(usuarioLogado)
+                .atualizadoPor(usuarioLogado)
+                .criadoEm(LocalDateTime.now())
+                .atualizadoEm(LocalDateTime.now())
                 .build();
+
+        if (noticia.getStatus() == StatusNoticia.PUBLICADO) {
+            noticia.setPublicadoEm(LocalDateTime.now());
+        }
+
         var salva = repository.save(noticia);
         estatisticaService.registrarEventoInterno(salva.getId(), TipoEntidade.NOTICIA, TipoEventoEstatistica.CRIACAO);
         return NoticiaResponseDTO.from(salva);
@@ -46,7 +59,9 @@ public class NoticiaService {
 
     @Transactional
     public NoticiaResponseDTO atualizar(Long id, NoticiaRequestDTO dto) {
+        var usuarioLogado = authenticationFacade.getAuthenticatedUser();
         var noticia = findOrThrow(id);
+
         noticia.setTitulo(dto.getTitulo());
         noticia.setConteudo(dto.getConteudo());
         noticia.setResumo(dto.getResumo());
@@ -55,6 +70,13 @@ public class NoticiaService {
         if (dto.getStatus() != null) noticia.setStatus(dto.getStatus());
         noticia.setTags(dto.getTags());
         noticia.setImagemUrl(dto.getImagemUrl());
+        noticia.setAtualizadoPor(usuarioLogado);
+        noticia.setAtualizadoEm(LocalDateTime.now());
+
+        if (noticia.getStatus() == StatusNoticia.PUBLICADO && noticia.getPublicadoEm() == null) {
+            noticia.setPublicadoEm(LocalDateTime.now());
+        }
+
         var salva = repository.save(noticia);
         estatisticaService.registrarEventoInterno(id, TipoEntidade.NOTICIA, TipoEventoEstatistica.ATUALIZACAO);
         return NoticiaResponseDTO.from(salva);
@@ -62,8 +84,17 @@ public class NoticiaService {
 
     @Transactional
     public NoticiaResponseDTO atualizarStatus(Long id, StatusNoticia status) {
+        var usuarioLogado = authenticationFacade.getAuthenticatedUser();
         var noticia = findOrThrow(id);
+
         noticia.setStatus(status);
+        noticia.setAtualizadoPor(usuarioLogado);
+        noticia.setAtualizadoEm(LocalDateTime.now());
+
+        if (status == StatusNoticia.PUBLICADO && noticia.getPublicadoEm() == null) {
+            noticia.setPublicadoEm(LocalDateTime.now());
+        }
+
         var salva = repository.save(noticia);
         estatisticaService.registrarEventoInterno(id, TipoEntidade.NOTICIA, TipoEventoEstatistica.ATUALIZACAO);
         return NoticiaResponseDTO.from(salva);
