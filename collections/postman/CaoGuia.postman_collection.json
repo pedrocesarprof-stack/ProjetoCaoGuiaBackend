@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "Projeto Cão-Guia Digital API",
-    "description": "Collection completa para testar todos os endpoints da API do Projeto Cão-Guia Digital.\n\n**Como usar:**\n1. Execute a requisição **Login** (pasta Usuários)\n2. O token JWT será salvo automaticamente na variável `token`\n3. Todas as demais requisições já usam esse token automaticamente\n\n**Admin padrão:** admin@caoguia.com / admin123",
+    "name": "Projeto Cão-Guia Digital API v0.5.0",
+    "description": "Collection completa para testar todos os endpoints da API do Projeto Cão-Guia Digital.\n\n**Novidades v0.5.0:**\n- Todas as entidades agora vinculam automaticamente o usuário autenticado\n- Validação de propriedade: usuários só editam seus próprios registros\n- Auditoria completa: campos criadoPor e atualizadoPor\n\n**Como usar:**\n1. Execute a requisição **Login** (pasta Usuários)\n2. O token JWT será salvo automaticamente na variável `token`\n3. Todas as demais requisições já usam esse token automaticamente\n\n**Admin padrão:** admin@caoguia.com / admin123",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
