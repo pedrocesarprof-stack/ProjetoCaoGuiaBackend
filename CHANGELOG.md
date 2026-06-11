@@ -8,6 +8,34 @@ Formato de versao:
 - `MINOR`: novas funcionalidades compativeis
 - `PATCH`: correcao e ajustes sem quebra
 
+## [0.5.0] - 2026-06-11
+
+### Added
+
+- Vinculacao automatica de Usuario em todas as entidades (Noticia, Depoimento, Treinamento, Formulario).
+- Campo `criadoPor` adicionado em todas as entidades para rastreabilidade.
+- Campo `atualizadoPor` adicionado em todas as entidades para auditoria.
+- Validacao de propriedade: usuarios somente podem editar/excluir seus proprios registros.
+- Administradores podem gerenciar todos os registros do sistema.
+
+### Changed
+
+- DTOs atualizados para incluir informacoes do usuario (ID, nome, email).
+- Services refatorados para obter usuario autenticado via `AuthenticationFacade`.
+- Campo `autor` removido da entidade Noticia (agora usa relacao com Usuario).
+- Endpoints de criacao nao requerem mais `usuarioId` no body (automatico via token JWT).
+
+### Fixed
+
+- Corrigida seguranca: usuarios nao podem mais modificar conteudo de outros usuarios.
+- Melhorada auditoria: todas as operacoes registram quem criou e quem atualizou.
+
+### Technical
+
+- Implementado padrao de auditoria com `@PrePersist` e `@PreUpdate`.
+- Adicionado `AuthenticationFacade` para abstrair obtencao do usuario autenticado.
+- Relacionamento `@ManyToOne` com Usuario em todas as entidades principais.
+
 ## [0.4.0] - 2026-06-11
 
 ### Added
