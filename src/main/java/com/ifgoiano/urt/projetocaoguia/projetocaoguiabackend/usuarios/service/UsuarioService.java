@@ -1,20 +1,26 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.service;
 
-import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.Usuario;
-import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.UsuarioRequestDTO;
-import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.UsuarioResponseDTO;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.core.security.JwtUtil;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEntidade;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEventoEstatistica;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.service.EstatisticaService;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.*;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final EstatisticaService estatisticaService;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     public UsuarioResponseDTO cadastrar(UsuarioRequestDTO dto) {
         if (dto.nome() == null || dto.nome().isBlank() ||
@@ -32,14 +38,16 @@ public class UsuarioService {
         Usuario usuario = Usuario.builder()
                 .nome(dto.nome().trim())
                 .email(emailTratado)
-                .senha(dto.senha().trim())
+                .senha(passwordEncoder.encode(dto.senha().trim()))
+                .perfil(PerfilUsuario.USER)
                 .build();
 
         Usuario salvo = usuarioRepository.save(usuario);
+        estatisticaService.registrarEventoInterno(salvo.getId(), TipoEntidade.USUARIO, TipoEventoEstatistica.CRIACAO);
         return new UsuarioResponseDTO(salvo);
     }
 
-    public UsuarioResponseDTO autenticar(String email, String senha) {
+    public LoginResponseDTO autenticar(String email, String senha) {
         if (email == null || email.isBlank() || senha == null || senha.isBlank()) {
             throw new RuntimeException("E-mail e senha são obrigatórios para o login!");
         }
@@ -49,11 +57,20 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findByEmail(emailTratado)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
 
-        if (!usuario.getSenha().equals(senha.trim())) {
+        if (!passwordEncoder.matches(senha.trim(), usuario.getSenha())) {
             throw new RuntimeException("Senha incorreta!");
         }
 
-        return new UsuarioResponseDTO(usuario);
+        String token = jwtUtil.gerarToken(usuario.getEmail(), usuario.getPerfil().name());
+        estatisticaService.registrarEventoInterno(usuario.getId(), TipoEntidade.USUARIO, TipoEventoEstatistica.VISUALIZACAO);
+
+        return new LoginResponseDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getPerfil().name(),
+                token
+        );
     }
 
     public List<UsuarioResponseDTO> listarTodos() {
@@ -72,7 +89,6 @@ public class UsuarioService {
 
         if (dto.email() != null && !dto.email().isBlank()) {
             String emailTratado = dto.email().trim().toLowerCase();
-
             var usuarioExistente = usuarioRepository.findByEmail(emailTratado);
             if (usuarioExistente.isPresent() && !usuarioExistente.get().getId().equals(id)) {
                 throw new RuntimeException("Este e-mail já está sendo usado por outro usuário!");
@@ -81,10 +97,11 @@ public class UsuarioService {
         }
 
         if (dto.senha() != null && !dto.senha().isBlank()) {
-            usuario.setSenha(dto.senha().trim());
+            usuario.setSenha(passwordEncoder.encode(dto.senha().trim()));
         }
 
         Usuario updated = usuarioRepository.save(usuario);
+        estatisticaService.registrarEventoInterno(id, TipoEntidade.USUARIO, TipoEventoEstatistica.ATUALIZACAO);
         return new UsuarioResponseDTO(updated);
     }
 }

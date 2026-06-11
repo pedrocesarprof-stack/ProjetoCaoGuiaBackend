@@ -5,6 +5,8 @@ public enum TipoEventoEstatistica {
     LIKE,
     DESLIKE,
     COMPARTILHAMENTO,
-    COMENTARIO
+    COMENTARIO,
+    CRIACAO,
+    ATUALIZACAO,
+    EXCLUSAO
 }
-

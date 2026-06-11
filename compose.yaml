@@ -1,0 +1,17 @@
+services:
+  sqlserver:
+    image: 'mcr.microsoft.com/mssql/server:2022-latest'
+    container_name: caoguia-sqlserver
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_SA_PASSWORD: 'CaoGuia@2026'
+      MSSQL_PID: 'Express'
+    ports:
+      - '1433:1433'
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+
+volumes:
+  sqlserver-data:
+    driver: local
+

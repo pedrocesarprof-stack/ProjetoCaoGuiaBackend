@@ -19,9 +19,13 @@ public class EstatisticaEvento {
     private Long id;
 
     @Column(nullable = false)
-    private Long noticiaId;
+    private Long entidadeId;
 
-    @Column(nullable = false, length = 120)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private TipoEntidade tipoEntidade;
+
+    @Column(length = 120)
     private String usuarioId;
 
     @Enumerated(EnumType.STRING)
@@ -39,4 +43,3 @@ public class EstatisticaEvento {
         criadoEm = LocalDateTime.now();
     }
 }
-

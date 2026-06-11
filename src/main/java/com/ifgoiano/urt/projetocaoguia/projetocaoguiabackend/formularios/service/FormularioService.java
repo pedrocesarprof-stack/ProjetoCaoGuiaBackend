@@ -1,10 +1,13 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.formularios.service;
 
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEntidade;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEventoEstatistica;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.service.EstatisticaService;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.formularios.model.Formulario;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.formularios.model.FormularioRequestDTO;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.formularios.model.FormularioResponseDTO;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.formularios.repository.FormularioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -12,10 +15,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class FormularioService {
 
-    @Autowired
-    private FormularioRepository formularioRepository;
+    private final FormularioRepository formularioRepository;
+    private final EstatisticaService estatisticaService;
 
     public FormularioResponseDTO salvarFormulario(FormularioRequestDTO dto) {
         if (dto.resposta() == null || dto.resposta().isBlank()) {
@@ -27,6 +31,7 @@ public class FormularioService {
         formulario.setResposta(dto.resposta().trim());
 
         Formulario salvo = formularioRepository.save(formulario);
+        estatisticaService.registrarEventoInterno(salvo.getId(), TipoEntidade.FORMULARIO, TipoEventoEstatistica.CRIACAO);
         return new FormularioResponseDTO(salvo);
     }
 
@@ -39,6 +44,7 @@ public class FormularioService {
     public FormularioResponseDTO buscarPorId(Long id) {
         Formulario formulario = formularioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Formulário não encontrado com o ID: " + id));
+        estatisticaService.registrarEventoInterno(id, TipoEntidade.FORMULARIO, TipoEventoEstatistica.VISUALIZACAO);
         return new FormularioResponseDTO(formulario);
     }
 
@@ -52,6 +58,7 @@ public class FormularioService {
 
         formulario.setResposta(dto.resposta().trim());
         Formulario atualizado = formularioRepository.save(formulario);
+        estatisticaService.registrarEventoInterno(id, TipoEntidade.FORMULARIO, TipoEventoEstatistica.ATUALIZACAO);
         return new FormularioResponseDTO(atualizado);
     }
 
@@ -59,5 +66,6 @@ public class FormularioService {
         Formulario formulario = formularioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Formulário não encontrado com o ID: " + id));
         formularioRepository.delete(formulario);
+        estatisticaService.registrarEventoInterno(id, TipoEntidade.FORMULARIO, TipoEventoEstatistica.EXCLUSAO);
     }
 }
