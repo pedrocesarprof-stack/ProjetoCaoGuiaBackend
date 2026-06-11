@@ -1,5 +1,6 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.service;
 
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.core.security.AuthenticationFacade;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.core.security.JwtUtil;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEntidade;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEventoEstatistica;
@@ -21,6 +22,7 @@ public class UsuarioService {
     private final EstatisticaService estatisticaService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final AuthenticationFacade authenticationFacade;
 
     public UsuarioResponseDTO cadastrar(UsuarioRequestDTO dto) {
         if (dto.nome() == null || dto.nome().isBlank() ||
@@ -40,6 +42,40 @@ public class UsuarioService {
                 .email(emailTratado)
                 .senha(passwordEncoder.encode(dto.senha().trim()))
                 .perfil(PerfilUsuario.USER)
+                .build();
+
+        Usuario salvo = usuarioRepository.save(usuario);
+        estatisticaService.registrarEventoInterno(salvo.getId(), TipoEntidade.USUARIO, TipoEventoEstatistica.CRIACAO);
+        return new UsuarioResponseDTO(salvo);
+    }
+
+    public UsuarioResponseDTO cadastrarAdmin(AdminRequestDTO dto) {
+        // Validar que apenas admins autenticados podem criar novos admins
+        Usuario usuarioAutenticado = authenticationFacade.getAuthenticatedUser();
+        if (usuarioAutenticado.getPerfil() != PerfilUsuario.ADMIN) {
+            throw new RuntimeException("Apenas administradores podem criar novos administradores!");
+        }
+
+        // Validações dos campos
+        if (dto.nome() == null || dto.nome().isBlank() ||
+                dto.email() == null || dto.email().isBlank() ||
+                dto.senha() == null || dto.senha().isBlank()) {
+            throw new RuntimeException("Todos os campos (nome, email e senha) são obrigatórios!");
+        }
+
+
+        String emailTratado = dto.email().trim().toLowerCase();
+
+        if (usuarioRepository.findByEmail(emailTratado).isPresent()) {
+            throw new RuntimeException("E-mail já cadastrado no sistema!");
+        }
+
+        Usuario usuario = Usuario.builder()
+                .nome(dto.nome().trim())
+                .email(emailTratado)
+                .telefone(dto.telefone() != null ? dto.telefone().trim() : null)
+                .senha(passwordEncoder.encode(dto.senha().trim()))
+                .perfil(PerfilUsuario.ADMIN)
                 .build();
 
         Usuario salvo = usuarioRepository.save(usuario);

@@ -110,6 +110,19 @@
           }
         },
         {
+          "name": "Cadastrar admin (ADMIN autenticado)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/usuarios/cadastro-admin", "host": ["{{baseUrl}}"], "path": ["api", "usuarios", "cadastro-admin"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Novo Admin\",\n  \"email\": \"novoadmin@caoguia.com\",\n  \"telefone\": \"62999887766\",\n  \"senha\": \"senhaSegura123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
           "name": "Atualizar usuário (ADMIN)",
           "request": {
             "method": "PUT",
@@ -372,7 +385,7 @@
             "url": { "raw": "{{baseUrl}}/api/formularios/1", "host": ["{{baseUrl}}"], "path": ["api", "formularios", "1"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"resposta\": \"Mensagem atualizada pelo administrador.\"\n}",
+              "raw": "{\n  \"nome\": \"Maria Silva Atualizada\",\n  \"email\": \"maria.nova@email.com\",\n  \"telefone\": \"62988776655\",\n  \"categoria\": \"DOACAO\",\n  \"resposta\": \"Mensagem atualizada pelo administrador.\"\n}",
               "options": { "raw": { "language": "json" } }
             }
           }

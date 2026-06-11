@@ -16,6 +16,7 @@ public class UsuarioSimplificadoDTO {
     private Long id;
     private String nome;
     private String email;
+    private String telefone;
 
     public static UsuarioSimplificadoDTO from(Usuario usuario) {
         if (usuario == null) {
@@ -25,7 +26,7 @@ public class UsuarioSimplificadoDTO {
                 .id(usuario.getId())
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
+                .telefone(usuario.getTelefone())
                 .build();
     }
 }
-

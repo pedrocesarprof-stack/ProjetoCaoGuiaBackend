@@ -18,11 +18,28 @@ public class Formulario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private String nome;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column(length = 20)
+    private String telefone;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private CategoriaFormulario categoria;
+
     @Column(name = "data_envio", nullable = false)
     private LocalDateTime dataEnvio;
 
     @Column(columnDefinition = "TEXT")
     private String resposta;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "criado_por_id", nullable = false)

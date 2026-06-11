@@ -25,6 +25,16 @@ public class FormularioService {
     private final AuthenticationFacade authenticationFacade;
 
     public FormularioResponseDTO salvarFormulario(FormularioRequestDTO dto) {
+        // Validações
+        if (dto.nome() == null || dto.nome().isBlank()) {
+            throw new RuntimeException("O nome não pode estar vazio!");
+        }
+        if (dto.email() == null || dto.email().isBlank()) {
+            throw new RuntimeException("O email não pode estar vazio!");
+        }
+        if (dto.categoria() == null) {
+            throw new RuntimeException("A categoria deve ser informada!");
+        }
         if (dto.resposta() == null || dto.resposta().isBlank()) {
             throw new RuntimeException("O conteúdo do formulário não pode estar vazio!");
         }
@@ -32,8 +42,13 @@ public class FormularioService {
         var usuarioLogado = authenticationFacade.getAuthenticatedUserOrNull();
 
         Formulario formulario = Formulario.builder()
+                .nome(dto.nome().trim())
+                .email(dto.email().trim().toLowerCase())
+                .telefone(dto.telefone() != null ? dto.telefone().trim() : null)
+                .categoria(dto.categoria())
                 .dataEnvio(LocalDateTime.now())
                 .resposta(dto.resposta().trim())
+                .usuario(usuarioLogado)
                 .criadoPor(usuarioLogado)
                 .atualizadoPor(usuarioLogado)
                 .build();
@@ -57,16 +72,27 @@ public class FormularioService {
     }
 
     public FormularioResponseDTO atualizarResposta(Long id, FormularioRequestDTO dto) {
-        if (dto.resposta() == null || dto.resposta().isBlank()) {
-            throw new RuntimeException("O conteúdo da resposta não pode estar vazio!");
-        }
-
         var usuarioLogado = authenticationFacade.getAuthenticatedUserOrNull();
 
         Formulario formulario = formularioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Formulário", id));
 
-        formulario.setResposta(dto.resposta().trim());
+        if (dto.nome() != null && !dto.nome().isBlank()) {
+            formulario.setNome(dto.nome().trim());
+        }
+        if (dto.email() != null && !dto.email().isBlank()) {
+            formulario.setEmail(dto.email().trim().toLowerCase());
+        }
+        if (dto.telefone() != null) {
+            formulario.setTelefone(dto.telefone().trim());
+        }
+        if (dto.categoria() != null) {
+            formulario.setCategoria(dto.categoria());
+        }
+        if (dto.resposta() != null && !dto.resposta().isBlank()) {
+            formulario.setResposta(dto.resposta().trim());
+        }
+
         formulario.setAtualizadoPor(usuarioLogado);
 
         Formulario atualizado = formularioRepository.save(formulario);
