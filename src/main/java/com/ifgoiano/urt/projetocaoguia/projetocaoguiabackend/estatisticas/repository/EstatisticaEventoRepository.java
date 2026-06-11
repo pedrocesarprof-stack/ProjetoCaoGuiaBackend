@@ -1,6 +1,7 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.repository;
 
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.EstatisticaEvento;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEntidade;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEventoEstatistica;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,18 +12,19 @@ import org.springframework.data.repository.query.Param;
 public interface EstatisticaEventoRepository extends JpaRepository<EstatisticaEvento, Long> {
 
     @Query("SELECT e FROM EstatisticaEvento e WHERE " +
-            "(:noticiaId IS NULL OR e.noticiaId = :noticiaId) AND " +
+            "(:entidadeId IS NULL OR e.entidadeId = :entidadeId) AND " +
+            "(:tipoEntidade IS NULL OR e.tipoEntidade = :tipoEntidade) AND " +
             "(:usuarioId IS NULL OR LOWER(e.usuarioId) LIKE LOWER(CONCAT('%', :usuarioId, '%'))) AND " +
             "(:tipoEvento IS NULL OR e.tipoEvento = :tipoEvento)")
     Page<EstatisticaEvento> buscarComFiltros(
-            @Param("noticiaId") Long noticiaId,
+            @Param("entidadeId") Long entidadeId,
+            @Param("tipoEntidade") TipoEntidade tipoEntidade,
             @Param("usuarioId") String usuarioId,
             @Param("tipoEvento") TipoEventoEstatistica tipoEvento,
             Pageable pageable
     );
 
-    long countByNoticiaId(Long noticiaId);
+    long countByEntidadeIdAndTipoEntidade(Long entidadeId, TipoEntidade tipoEntidade);
 
-    long countByNoticiaIdAndTipoEvento(Long noticiaId, TipoEventoEstatistica tipoEvento);
+    long countByEntidadeIdAndTipoEntidadeAndTipoEvento(Long entidadeId, TipoEntidade tipoEntidade, TipoEventoEstatistica tipoEvento);
 }
-

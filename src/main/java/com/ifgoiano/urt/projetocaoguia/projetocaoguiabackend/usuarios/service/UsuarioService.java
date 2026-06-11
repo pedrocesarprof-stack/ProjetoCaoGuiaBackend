@@ -1,20 +1,24 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.service;
 
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEntidade;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEventoEstatistica;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.service.EstatisticaService;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.Usuario;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.UsuarioRequestDTO;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.UsuarioResponseDTO;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final EstatisticaService estatisticaService;
 
     public UsuarioResponseDTO cadastrar(UsuarioRequestDTO dto) {
         if (dto.nome() == null || dto.nome().isBlank() ||
@@ -36,6 +40,7 @@ public class UsuarioService {
                 .build();
 
         Usuario salvo = usuarioRepository.save(usuario);
+        estatisticaService.registrarEventoInterno(salvo.getId(), TipoEntidade.USUARIO, TipoEventoEstatistica.CRIACAO);
         return new UsuarioResponseDTO(salvo);
     }
 
@@ -53,6 +58,7 @@ public class UsuarioService {
             throw new RuntimeException("Senha incorreta!");
         }
 
+        estatisticaService.registrarEventoInterno(usuario.getId(), TipoEntidade.USUARIO, TipoEventoEstatistica.VISUALIZACAO);
         return new UsuarioResponseDTO(usuario);
     }
 
@@ -85,6 +91,7 @@ public class UsuarioService {
         }
 
         Usuario updated = usuarioRepository.save(usuario);
+        estatisticaService.registrarEventoInterno(id, TipoEntidade.USUARIO, TipoEventoEstatistica.ATUALIZACAO);
         return new UsuarioResponseDTO(updated);
     }
 }

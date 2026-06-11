@@ -1,9 +1,7 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.service;
 
-import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.core.NoticiaNotFoundException;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.*;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.repository.EstatisticaEventoRepository;
-import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.noticias.repository.NoticiaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,14 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class EstatisticaService {
 
     private final EstatisticaEventoRepository repository;
-    private final NoticiaRepository noticiaRepository;
 
     @Transactional
     public EstatisticaEventoResponseDTO registrarEvento(EstatisticaEventoRequestDTO dto) {
-        validarNoticia(dto.getNoticiaId());
-
         var evento = EstatisticaEvento.builder()
-                .noticiaId(dto.getNoticiaId())
+                .entidadeId(dto.getEntidadeId())
+                .tipoEntidade(dto.getTipoEntidade())
                 .usuarioId(dto.getUsuarioId())
                 .tipoEvento(dto.getTipoEvento())
                 .origem(dto.getOrigem())
@@ -31,33 +27,42 @@ public class EstatisticaService {
         return EstatisticaEventoResponseDTO.from(repository.save(evento));
     }
 
+    @Transactional
+    public void registrarEventoInterno(Long entidadeId, TipoEntidade tipoEntidade, TipoEventoEstatistica tipoEvento) {
+        var evento = EstatisticaEvento.builder()
+                .entidadeId(entidadeId)
+                .tipoEntidade(tipoEntidade)
+                .usuarioId("sistema")
+                .tipoEvento(tipoEvento)
+                .origem("interno")
+                .build();
+
+        repository.save(evento);
+    }
+
     public Page<EstatisticaEventoResponseDTO> listarEventos(
-            Long noticiaId,
+            Long entidadeId,
+            TipoEntidade tipoEntidade,
             String usuarioId,
             TipoEventoEstatistica tipoEvento,
             Pageable pageable) {
-        return repository.buscarComFiltros(noticiaId, usuarioId, tipoEvento, pageable)
+        return repository.buscarComFiltros(entidadeId, tipoEntidade, usuarioId, tipoEvento, pageable)
                 .map(EstatisticaEventoResponseDTO::from);
     }
 
-    public EstatisticaResumoDTO resumoPorNoticia(Long noticiaId) {
-        validarNoticia(noticiaId);
-
+    public EstatisticaResumoDTO resumoPorEntidade(Long entidadeId, TipoEntidade tipoEntidade) {
         return EstatisticaResumoDTO.builder()
-                .noticiaId(noticiaId)
-                .totalEventos(repository.countByNoticiaId(noticiaId))
-                .totalVisualizacoes(repository.countByNoticiaIdAndTipoEvento(noticiaId, TipoEventoEstatistica.VISUALIZACAO))
-                .totalLikes(repository.countByNoticiaIdAndTipoEvento(noticiaId, TipoEventoEstatistica.LIKE))
-                .totalDeslikes(repository.countByNoticiaIdAndTipoEvento(noticiaId, TipoEventoEstatistica.DESLIKE))
-                .totalCompartilhamentos(repository.countByNoticiaIdAndTipoEvento(noticiaId, TipoEventoEstatistica.COMPARTILHAMENTO))
-                .totalComentarios(repository.countByNoticiaIdAndTipoEvento(noticiaId, TipoEventoEstatistica.COMENTARIO))
+                .entidadeId(entidadeId)
+                .tipoEntidade(tipoEntidade)
+                .totalEventos(repository.countByEntidadeIdAndTipoEntidade(entidadeId, tipoEntidade))
+                .totalVisualizacoes(repository.countByEntidadeIdAndTipoEntidadeAndTipoEvento(entidadeId, tipoEntidade, TipoEventoEstatistica.VISUALIZACAO))
+                .totalLikes(repository.countByEntidadeIdAndTipoEntidadeAndTipoEvento(entidadeId, tipoEntidade, TipoEventoEstatistica.LIKE))
+                .totalDeslikes(repository.countByEntidadeIdAndTipoEntidadeAndTipoEvento(entidadeId, tipoEntidade, TipoEventoEstatistica.DESLIKE))
+                .totalCompartilhamentos(repository.countByEntidadeIdAndTipoEntidadeAndTipoEvento(entidadeId, tipoEntidade, TipoEventoEstatistica.COMPARTILHAMENTO))
+                .totalComentarios(repository.countByEntidadeIdAndTipoEntidadeAndTipoEvento(entidadeId, tipoEntidade, TipoEventoEstatistica.COMENTARIO))
+                .totalCriacoes(repository.countByEntidadeIdAndTipoEntidadeAndTipoEvento(entidadeId, tipoEntidade, TipoEventoEstatistica.CRIACAO))
+                .totalAtualizacoes(repository.countByEntidadeIdAndTipoEntidadeAndTipoEvento(entidadeId, tipoEntidade, TipoEventoEstatistica.ATUALIZACAO))
+                .totalExclusoes(repository.countByEntidadeIdAndTipoEntidadeAndTipoEvento(entidadeId, tipoEntidade, TipoEventoEstatistica.EXCLUSAO))
                 .build();
     }
-
-    private void validarNoticia(Long noticiaId) {
-        if (!noticiaRepository.existsById(noticiaId)) {
-            throw new NoticiaNotFoundException(noticiaId);
-        }
-    }
 }
-

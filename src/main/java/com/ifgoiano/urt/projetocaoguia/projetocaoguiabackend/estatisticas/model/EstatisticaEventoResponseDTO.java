@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
 @Builder
 public class EstatisticaEventoResponseDTO {
     private Long id;
-    private Long noticiaId;
+    private Long entidadeId;
+    private TipoEntidade tipoEntidade;
     private String usuarioId;
     private TipoEventoEstatistica tipoEvento;
     private String origem;
@@ -18,7 +19,8 @@ public class EstatisticaEventoResponseDTO {
     public static EstatisticaEventoResponseDTO from(EstatisticaEvento evento) {
         return EstatisticaEventoResponseDTO.builder()
                 .id(evento.getId())
-                .noticiaId(evento.getNoticiaId())
+                .entidadeId(evento.getEntidadeId())
+                .tipoEntidade(evento.getTipoEntidade())
                 .usuarioId(evento.getUsuarioId())
                 .tipoEvento(evento.getTipoEvento())
                 .origem(evento.getOrigem())
@@ -26,4 +28,3 @@ public class EstatisticaEventoResponseDTO {
                 .build();
     }
 }
-

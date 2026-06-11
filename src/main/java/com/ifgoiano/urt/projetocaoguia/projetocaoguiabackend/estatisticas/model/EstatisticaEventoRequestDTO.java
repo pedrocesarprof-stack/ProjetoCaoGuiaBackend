@@ -1,21 +1,21 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class EstatisticaEventoRequestDTO {
 
-    @NotNull(message = "noticiaId e obrigatorio")
-    private Long noticiaId;
+    @NotNull(message = "entidadeId é obrigatório")
+    private Long entidadeId;
 
-    @NotBlank(message = "usuarioId e obrigatorio")
+    @NotNull(message = "tipoEntidade é obrigatório")
+    private TipoEntidade tipoEntidade;
+
     private String usuarioId;
 
-    @NotNull(message = "tipoEvento e obrigatorio")
+    @NotNull(message = "tipoEvento é obrigatório")
     private TipoEventoEstatistica tipoEvento;
 
     private String origem;
 }
-

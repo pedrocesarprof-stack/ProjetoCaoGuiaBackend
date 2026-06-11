@@ -4,6 +4,9 @@ import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.depoimento.dto.Depo
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.depoimento.dto.DepoimentoResponseDTO;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.depoimento.model.Depoimento;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.depoimento.repository.DepoimentoRepository;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEntidade;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEventoEstatistica;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.service.EstatisticaService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,15 +20,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class DepoimentoService {
 
     private final DepoimentoRepository repository;
+    private final EstatisticaService estatisticaService;
 
     @Transactional
     public DepoimentoResponseDTO criar(DepoimentoRequestDTO dto) {
-
         Depoimento depoimento = Depoimento.builder()
                 .descricao(dto.getDescricao())
                 .build();
-
-        return DepoimentoResponseDTO.from(repository.save(depoimento));
+        var salvo = repository.save(depoimento);
+        estatisticaService.registrarEventoInterno(salvo.getId(), TipoEntidade.DEPOIMENTO, TipoEventoEstatistica.CRIACAO);
+        return DepoimentoResponseDTO.from(salvo);
     }
 
     public Page<DepoimentoResponseDTO> listar(Pageable pageable) {
@@ -34,33 +38,27 @@ public class DepoimentoService {
     }
 
     public DepoimentoResponseDTO buscarPorId(Long id) {
-
         Depoimento depoimento = repository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Depoimento não encontrado"));
-
+                .orElseThrow(() -> new RuntimeException("Depoimento não encontrado"));
+        estatisticaService.registrarEventoInterno(id, TipoEntidade.DEPOIMENTO, TipoEventoEstatistica.VISUALIZACAO);
         return DepoimentoResponseDTO.from(depoimento);
     }
 
     @Transactional
     public DepoimentoResponseDTO atualizar(Long id, DepoimentoRequestDTO dto) {
-
         Depoimento depoimento = repository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Depoimento não encontrado"));
-
+                .orElseThrow(() -> new RuntimeException("Depoimento não encontrado"));
         depoimento.setDescricao(dto.getDescricao());
-
-        return DepoimentoResponseDTO.from(repository.save(depoimento));
+        var salvo = repository.save(depoimento);
+        estatisticaService.registrarEventoInterno(id, TipoEntidade.DEPOIMENTO, TipoEventoEstatistica.ATUALIZACAO);
+        return DepoimentoResponseDTO.from(salvo);
     }
 
     @Transactional
     public void remover(Long id) {
-
         Depoimento depoimento = repository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Depoimento não encontrado"));
-
+                .orElseThrow(() -> new RuntimeException("Depoimento não encontrado"));
         repository.delete(depoimento);
+        estatisticaService.registrarEventoInterno(id, TipoEntidade.DEPOIMENTO, TipoEventoEstatistica.EXCLUSAO);
     }
 }

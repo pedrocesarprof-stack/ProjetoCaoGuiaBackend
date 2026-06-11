@@ -1,6 +1,9 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.noticias.service;
 
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.core.NoticiaNotFoundException;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEntidade;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.TipoEventoEstatistica;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.service.EstatisticaService;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.noticias.model.*;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.noticias.repository.NoticiaRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ import java.time.LocalDateTime;
 public class NoticiaService {
 
     private final NoticiaRepository repository;
+    private final EstatisticaService estatisticaService;
 
     @Transactional
     public NoticiaResponseDTO criar(NoticiaRequestDTO dto) {
@@ -29,11 +33,15 @@ public class NoticiaService {
                 .tags(dto.getTags())
                 .imagemUrl(dto.getImagemUrl())
                 .build();
-        return NoticiaResponseDTO.from(repository.save(noticia));
+        var salva = repository.save(noticia);
+        estatisticaService.registrarEventoInterno(salva.getId(), TipoEntidade.NOTICIA, TipoEventoEstatistica.CRIACAO);
+        return NoticiaResponseDTO.from(salva);
     }
 
     public NoticiaResponseDTO buscarPorId(Long id) {
-        return NoticiaResponseDTO.from(findOrThrow(id));
+        var noticia = findOrThrow(id);
+        estatisticaService.registrarEventoInterno(id, TipoEntidade.NOTICIA, TipoEventoEstatistica.VISUALIZACAO);
+        return NoticiaResponseDTO.from(noticia);
     }
 
     @Transactional
@@ -47,20 +55,25 @@ public class NoticiaService {
         if (dto.getStatus() != null) noticia.setStatus(dto.getStatus());
         noticia.setTags(dto.getTags());
         noticia.setImagemUrl(dto.getImagemUrl());
-        return NoticiaResponseDTO.from(repository.save(noticia));
+        var salva = repository.save(noticia);
+        estatisticaService.registrarEventoInterno(id, TipoEntidade.NOTICIA, TipoEventoEstatistica.ATUALIZACAO);
+        return NoticiaResponseDTO.from(salva);
     }
 
     @Transactional
     public NoticiaResponseDTO atualizarStatus(Long id, StatusNoticia status) {
         var noticia = findOrThrow(id);
         noticia.setStatus(status);
-        return NoticiaResponseDTO.from(repository.save(noticia));
+        var salva = repository.save(noticia);
+        estatisticaService.registrarEventoInterno(id, TipoEntidade.NOTICIA, TipoEventoEstatistica.ATUALIZACAO);
+        return NoticiaResponseDTO.from(salva);
     }
 
     @Transactional
     public void deletar(Long id) {
         findOrThrow(id);
         repository.deleteById(id);
+        estatisticaService.registrarEventoInterno(id, TipoEntidade.NOTICIA, TipoEventoEstatistica.EXCLUSAO);
     }
 
     public Page<NoticiaResponseDTO> listar(
@@ -73,10 +86,8 @@ public class NoticiaService {
                 .map(NoticiaResponseDTO::from);
     }
 
-
     private Noticia findOrThrow(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NoticiaNotFoundException(id));
     }
 }
-
