@@ -1,5 +1,6 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.service;
 
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.core.security.AuthenticationFacade;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.model.*;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.estatisticas.repository.EstatisticaEventoRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,13 +14,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class EstatisticaService {
 
     private final EstatisticaEventoRepository repository;
+    private final AuthenticationFacade authenticationFacade;
 
     @Transactional
     public EstatisticaEventoResponseDTO registrarEvento(EstatisticaEventoRequestDTO dto) {
+        var usuario = authenticationFacade.getAuthenticatedUserOrNull();
+
         var evento = EstatisticaEvento.builder()
                 .entidadeId(dto.getEntidadeId())
                 .tipoEntidade(dto.getTipoEntidade())
-                .usuarioId(dto.getUsuarioId())
+                .usuario(usuario)
                 .tipoEvento(dto.getTipoEvento())
                 .origem(dto.getOrigem())
                 .build();
@@ -29,10 +33,12 @@ public class EstatisticaService {
 
     @Transactional
     public void registrarEventoInterno(Long entidadeId, TipoEntidade tipoEntidade, TipoEventoEstatistica tipoEvento) {
+        var usuario = authenticationFacade.getAuthenticatedUserOrNull();
+
         var evento = EstatisticaEvento.builder()
                 .entidadeId(entidadeId)
                 .tipoEntidade(tipoEntidade)
-                .usuarioId("sistema")
+                .usuario(usuario)
                 .tipoEvento(tipoEvento)
                 .origem("interno")
                 .build();
@@ -43,7 +49,7 @@ public class EstatisticaService {
     public Page<EstatisticaEventoResponseDTO> listarEventos(
             Long entidadeId,
             TipoEntidade tipoEntidade,
-            String usuarioId,
+            Long usuarioId,
             TipoEventoEstatistica tipoEvento,
             Pageable pageable) {
         return repository.buscarComFiltros(entidadeId, tipoEntidade, usuarioId, tipoEvento, pageable)

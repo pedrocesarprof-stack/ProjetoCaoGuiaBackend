@@ -1,5 +1,6 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.noticias.model;
 
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -40,6 +41,14 @@ public class Noticia {
     private String tags;
 
     private String imagemUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "criado_por_id", nullable = false)
+    private Usuario criadoPor;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "atualizado_por_id")
+    private Usuario atualizadoPor;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime criadoEm;

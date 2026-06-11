@@ -1,5 +1,6 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.formularios.model;
 
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -22,4 +23,31 @@ public class Formulario {
 
     @Column(columnDefinition = "TEXT")
     private String resposta;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "criado_por_id", nullable = false)
+    private Usuario criadoPor;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "atualizado_por_id")
+    private Usuario atualizadoPor;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime criadoEm;
+
+    private LocalDateTime atualizadoEm;
+
+    @PrePersist
+    protected void onCreate() {
+        criadoEm = LocalDateTime.now();
+        atualizadoEm = LocalDateTime.now();
+        if (dataEnvio == null) {
+            dataEnvio = LocalDateTime.now();
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        atualizadoEm = LocalDateTime.now();
+    }
 }

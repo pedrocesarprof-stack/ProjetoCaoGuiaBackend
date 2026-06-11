@@ -54,7 +54,7 @@ public class EstatisticaController {
             @RequestParam(required = false) TipoEntidade tipoEntidade,
 
             @Parameter(description = "Filtrar por ID do usuário")
-            @RequestParam(required = false) String usuarioId,
+            @RequestParam(required = false) Long usuarioId,
 
             @Parameter(description = "Filtrar por tipo de evento")
             @RequestParam(required = false) TipoEventoEstatistica tipoEvento,

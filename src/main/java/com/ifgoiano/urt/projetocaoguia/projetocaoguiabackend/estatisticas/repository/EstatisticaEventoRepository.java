@@ -14,12 +14,12 @@ public interface EstatisticaEventoRepository extends JpaRepository<EstatisticaEv
     @Query("SELECT e FROM EstatisticaEvento e WHERE " +
             "(:entidadeId IS NULL OR e.entidadeId = :entidadeId) AND " +
             "(:tipoEntidade IS NULL OR e.tipoEntidade = :tipoEntidade) AND " +
-            "(:usuarioId IS NULL OR LOWER(e.usuarioId) LIKE LOWER(CONCAT('%', :usuarioId, '%'))) AND " +
+            "(:usuarioId IS NULL OR e.usuario.id = :usuarioId) AND " +
             "(:tipoEvento IS NULL OR e.tipoEvento = :tipoEvento)")
     Page<EstatisticaEvento> buscarComFiltros(
             @Param("entidadeId") Long entidadeId,
             @Param("tipoEntidade") TipoEntidade tipoEntidade,
-            @Param("usuarioId") String usuarioId,
+            @Param("usuarioId") Long usuarioId,
             @Param("tipoEvento") TipoEventoEstatistica tipoEvento,
             Pageable pageable
     );

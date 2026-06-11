@@ -1,5 +1,6 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.noticias.model;
 
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.UsuarioSimplificadoDTO;
 import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -17,6 +18,8 @@ public class NoticiaResponseDTO {
     private StatusNoticia status;
     private String tags;
     private String imagemUrl;
+    private UsuarioSimplificadoDTO criadoPor;
+    private UsuarioSimplificadoDTO atualizadoPor;
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
     private LocalDateTime publicadoEm;
@@ -32,6 +35,8 @@ public class NoticiaResponseDTO {
                 .status(n.getStatus())
                 .tags(n.getTags())
                 .imagemUrl(n.getImagemUrl())
+                .criadoPor(UsuarioSimplificadoDTO.from(n.getCriadoPor()))
+                .atualizadoPor(UsuarioSimplificadoDTO.from(n.getAtualizadoPor()))
                 .criadoEm(n.getCriadoEm())
                 .atualizadoEm(n.getAtualizadoEm())
                 .publicadoEm(n.getPublicadoEm())

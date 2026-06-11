@@ -12,7 +12,6 @@ public class EstatisticaEventoRequestDTO {
     @NotNull(message = "tipoEntidade é obrigatório")
     private TipoEntidade tipoEntidade;
 
-    private String usuarioId;
 
     @NotNull(message = "tipoEvento é obrigatório")
     private TipoEventoEstatistica tipoEvento;
