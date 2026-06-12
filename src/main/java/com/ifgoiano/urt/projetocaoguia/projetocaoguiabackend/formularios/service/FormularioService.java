@@ -26,28 +26,27 @@ public class FormularioService {
 
     public FormularioResponseDTO salvarFormulario(FormularioRequestDTO dto) {
         // Validações
-        if (dto.nome() == null || dto.nome().isBlank()) {
-            throw new RuntimeException("O nome não pode estar vazio!");
-        }
-        if (dto.email() == null || dto.email().isBlank()) {
-            throw new RuntimeException("O email não pode estar vazio!");
-        }
         if (dto.categoria() == null) {
             throw new RuntimeException("A categoria deve ser informada!");
         }
-        if (dto.resposta() == null || dto.resposta().isBlank()) {
-            throw new RuntimeException("O conteúdo do formulário não pode estar vazio!");
+        if (dto.observacao() == null || dto.observacao().isBlank()) {
+            throw new RuntimeException("A observação não pode estar vazia!");
         }
 
         var usuarioLogado = authenticationFacade.getAuthenticatedUserOrNull();
 
+        // Se não houver usuário autenticado, não permite envio
+        if (usuarioLogado == null) {
+            throw new RuntimeException("É necessário estar autenticado para enviar um formulário!");
+        }
+
         Formulario formulario = Formulario.builder()
-                .nome(dto.nome().trim())
-                .email(dto.email().trim().toLowerCase())
-                .telefone(dto.telefone() != null ? dto.telefone().trim() : null)
+                .nome(usuarioLogado.getNome())
+                .email(usuarioLogado.getEmail())
+                .telefone(usuarioLogado.getTelefone())
                 .categoria(dto.categoria())
                 .dataEnvio(LocalDateTime.now())
-                .resposta(dto.resposta().trim())
+                .observacao(dto.observacao().trim())
                 .usuario(usuarioLogado)
                 .criadoPor(usuarioLogado)
                 .atualizadoPor(usuarioLogado)
@@ -77,20 +76,11 @@ public class FormularioService {
         Formulario formulario = formularioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Formulário", id));
 
-        if (dto.nome() != null && !dto.nome().isBlank()) {
-            formulario.setNome(dto.nome().trim());
-        }
-        if (dto.email() != null && !dto.email().isBlank()) {
-            formulario.setEmail(dto.email().trim().toLowerCase());
-        }
-        if (dto.telefone() != null) {
-            formulario.setTelefone(dto.telefone().trim());
-        }
         if (dto.categoria() != null) {
             formulario.setCategoria(dto.categoria());
         }
-        if (dto.resposta() != null && !dto.resposta().isBlank()) {
-            formulario.setResposta(dto.resposta().trim());
+        if (dto.observacao() != null && !dto.observacao().isBlank()) {
+            formulario.setObservacao(dto.observacao().trim());
         }
 
         formulario.setAtualizadoPor(usuarioLogado);

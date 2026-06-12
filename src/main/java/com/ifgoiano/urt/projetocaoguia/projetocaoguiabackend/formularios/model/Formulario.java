@@ -35,7 +35,7 @@ public class Formulario {
     private LocalDateTime dataEnvio;
 
     @Column(columnDefinition = "TEXT")
-    private String resposta;
+    private String observacao;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")

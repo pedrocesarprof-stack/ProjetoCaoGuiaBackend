@@ -70,7 +70,7 @@ CREATE TABLE master.dbo.formularios (
 	data_envio datetime2 NOT NULL,
 	email varchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	nome varchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-	resposta text COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	observacao text COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	telefone varchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	atualizado_por_id bigint NULL,
 	criado_por_id bigint NOT NULL,

@@ -40,6 +40,7 @@ public class UsuarioService {
         Usuario usuario = Usuario.builder()
                 .nome(dto.nome().trim())
                 .email(emailTratado)
+                .telefone(dto.telefone() != null ? dto.telefone().trim() : null)
                 .senha(passwordEncoder.encode(dto.senha().trim()))
                 .perfil(PerfilUsuario.USER)
                 .build();
@@ -130,6 +131,10 @@ public class UsuarioService {
                 throw new RuntimeException("Este e-mail já está sendo usado por outro usuário!");
             }
             usuario.setEmail(emailTratado);
+        }
+
+        if (dto.telefone() != null) {
+            usuario.setTelefone(dto.telefone().trim());
         }
 
         if (dto.senha() != null && !dto.senha().isBlank()) {
