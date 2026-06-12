@@ -350,17 +350,18 @@
       "name": "📋 Formulários",
       "item": [
         {
-          "name": "Enviar formulário (autenticado)",
+          "name": "Enviar formulário (público)",
           "request": {
+            "auth": { "type": "noauth" },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": { "raw": "{{baseUrl}}/api/formularios", "host": ["{{baseUrl}}"], "path": ["api", "formularios"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"categoria\": \"CEGO\",\n  \"observacao\": \"Gostaria de saber mais sobre o programa de adoção de cães-guia.\"\n}",
+              "raw": "{\n  \"nome\": \"Maria Silva\",\n  \"email\": \"maria@email.com\",\n  \"telefone\": \"62999887766\",\n  \"categoria\": \"CEGO\",\n  \"resposta\": \"Gostaria de saber mais sobre o programa de adoção de cães-guia.\"\n}",
               "options": { "raw": { "language": "json" } }
             },
-            "description": "Dados do usuário (nome, email, telefone) são obtidos automaticamente do Bearer token. Categorias: CEGO, FAMILIA_ACOLHEDORA, SOCIALIZADORA, DOACAO"
+            "description": "Categorias disponíveis: CEGO, FAMILIA_ACOLHEDORA, SOCIALIZADORA, DOACAO"
           }
         },
         {
