@@ -63,6 +63,7 @@ public class NoticiaService {
         var noticia = findOrThrow(id);
 
         noticia.setTitulo(dto.getTitulo());
+        noticia.setTitulo(dto.getTitulo());
         noticia.setConteudo(dto.getConteudo());
         noticia.setResumo(dto.getResumo());
         noticia.setAutor(dto.getAutor());

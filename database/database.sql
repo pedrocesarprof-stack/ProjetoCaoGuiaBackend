@@ -65,15 +65,22 @@ ALTER TABLE master.dbo.estatistica_eventos WITH NOCHECK ADD CONSTRAINT CK__estat
 CREATE TABLE master.dbo.formularios (
 	id bigint IDENTITY(1,1) NOT NULL,
 	atualizado_em datetime2 NULL,
+	categoria varchar(30) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	criado_em datetime2 NOT NULL,
 	data_envio datetime2 NOT NULL,
-	resposta text COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	email varchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+	nome varchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+	observacao text COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	telefone varchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	atualizado_por_id bigint NULL,
 	criado_por_id bigint NOT NULL,
+	usuario_id bigint NULL,
 	CONSTRAINT PK__formular__3213E83F00DA43DD PRIMARY KEY (id),
 	CONSTRAINT FK10ngrhnjuymyb4bj952acn71b FOREIGN KEY (criado_por_id) REFERENCES master.dbo.usuarios(id),
-	CONSTRAINT FKqin91uua9mu4ggech7e1p80qp FOREIGN KEY (atualizado_por_id) REFERENCES master.dbo.usuarios(id)
+	CONSTRAINT FKqin91uua9mu4ggech7e1p80qp FOREIGN KEY (atualizado_por_id) REFERENCES master.dbo.usuarios(id),
+	CONSTRAINT FK_formularios_usuario FOREIGN KEY (usuario_id) REFERENCES master.dbo.usuarios(id)
 );
+ALTER TABLE master.dbo.formularios WITH NOCHECK ADD CONSTRAINT CK_formularios_categoria CHECK (([categoria]='CEGO' OR [categoria]='FAMILIA_ACOLHEDORA' OR [categoria]='SOCIALIZADORA' OR [categoria]='DOACAO'));
 
 
 -- master.dbo.noticias definição

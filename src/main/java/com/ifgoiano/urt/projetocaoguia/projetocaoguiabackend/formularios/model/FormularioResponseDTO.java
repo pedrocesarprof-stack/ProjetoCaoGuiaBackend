@@ -14,19 +14,19 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class FormularioResponseDTO {
     private Long id;
+    private UsuarioSimplificadoDTO usuario;
+    private CategoriaFormulario categoria;
+    private String observacao;
     private LocalDateTime dataEnvio;
-    private String resposta;
-    private UsuarioSimplificadoDTO criadoPor;
-    private UsuarioSimplificadoDTO atualizadoPor;
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
 
     public FormularioResponseDTO(Formulario formulario) {
         this.id = formulario.getId();
+        this.usuario = UsuarioSimplificadoDTO.from(formulario.getUsuario());
+        this.categoria = formulario.getCategoria();
+        this.observacao = formulario.getObservacao();
         this.dataEnvio = formulario.getDataEnvio();
-        this.resposta = formulario.getResposta();
-        this.criadoPor = UsuarioSimplificadoDTO.from(formulario.getCriadoPor());
-        this.atualizadoPor = UsuarioSimplificadoDTO.from(formulario.getAtualizadoPor());
         this.criadoEm = formulario.getCriadoEm();
         this.atualizadoEm = formulario.getAtualizadoEm();
     }

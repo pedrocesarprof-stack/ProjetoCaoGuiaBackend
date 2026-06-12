@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.ifgoiano.urt.projetocaoguia</groupId>
     <artifactId>ProjetoCaoGuiaBackend</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
     <name>ProjetoCaoGuiaBackend</name>
     <description>ProjetoCaoGuiaBackend</description>
     <url/>

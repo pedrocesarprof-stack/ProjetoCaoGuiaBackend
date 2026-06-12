@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "Projeto Cão-Guia Digital API v0.5.0",
-    "description": "Collection completa para testar todos os endpoints da API do Projeto Cão-Guia Digital.\n\n**Novidades v0.5.0:**\n- Todas as entidades agora vinculam automaticamente o usuário autenticado\n- Validação de propriedade: usuários só editam seus próprios registros\n- Auditoria completa: campos criadoPor e atualizadoPor\n\n**Como usar:**\n1. Execute a requisição **Login** (pasta Usuários)\n2. O token JWT será salvo automaticamente na variável `token`\n3. Todas as demais requisições já usam esse token automaticamente\n\n**Admin padrão:** admin@caoguia.com / admin123",
+    "name": "Projeto Cão-Guia Digital API v0.6.0",
+    "description": "Collection completa para testar todos os endpoints da API do Projeto Cão-Guia Digital.\n\n**Novidades v0.6.0:**\n- Sistema de criação de admins via Bearer token JWT (apenas admins autenticados)\n- Formulário simplificado: dados do usuário obtidos automaticamente do token\n- Campo telefone adicionado no cadastro de usuários\n\n**Recursos:**\n- Todas as entidades vinculam automaticamente o usuário autenticado\n- Validação de propriedade: usuários só editam seus próprios registros\n- Auditoria completa: campos criadoPor e atualizadoPor\n\n**Como usar:**\n1. Execute a requisição **Login** (pasta Usuários)\n2. O token JWT será salvo automaticamente na variável `token`\n3. Todas as demais requisições já usam esse token automaticamente\n\n**Admin padrão:** admin@caoguia.com / admin123",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -39,7 +39,7 @@
             "url": { "raw": "{{baseUrl}}/api/usuarios/cadastro", "host": ["{{baseUrl}}"], "path": ["api", "usuarios", "cadastro"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"João da Silva\",\n  \"email\": \"joao@email.com\",\n  \"senha\": \"senha123\"\n}",
+              "raw": "{\n  \"nome\": \"João da Silva\",\n  \"email\": \"joao@email.com\",\n  \"telefone\": \"62999887766\",\n  \"senha\": \"senha123\"\n}",
               "options": { "raw": { "language": "json" } }
             }
           }
@@ -110,6 +110,19 @@
           }
         },
         {
+          "name": "Cadastrar admin (ADMIN autenticado)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/usuarios/cadastro-admin", "host": ["{{baseUrl}}"], "path": ["api", "usuarios", "cadastro-admin"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Novo Admin\",\n  \"email\": \"novoadmin@caoguia.com\",\n  \"telefone\": \"62999887766\",\n  \"senha\": \"senhaSegura123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
           "name": "Atualizar usuário (ADMIN)",
           "request": {
             "method": "PUT",
@@ -117,7 +130,7 @@
             "url": { "raw": "{{baseUrl}}/api/usuarios/1", "host": ["{{baseUrl}}"], "path": ["api", "usuarios", "1"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"João Atualizado\",\n  \"email\": \"joao.novo@email.com\",\n  \"senha\": \"novaSenha456\"\n}",
+              "raw": "{\n  \"nome\": \"João Atualizado\",\n  \"email\": \"joao.novo@email.com\",\n  \"telefone\": \"62988776655\",\n  \"senha\": \"novaSenha456\"\n}",
               "options": { "raw": { "language": "json" } }
             }
           }
@@ -306,7 +319,7 @@
             "url": { "raw": "{{baseUrl}}/api/treinamentos", "host": ["{{baseUrl}}"], "path": ["api", "treinamentos"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"titulo\": \"Comandos básicos para cão-guia\",\n  \"descricao\": \"Aprenda os comandos essenciais para o treinamento inicial do seu cão-guia.\",\n  \"etapa\": 1\n}",
+              "raw": "{\n  \"titulo\": \"Comandos básicos para cão-guia\",\n  \"descricao\": \"Aprenda os comandos essenciais para o treinamento inicial do seu cão-guia.\",\n  \"etapa\": \"Etapa 1 - Comandos Básicos\"\n}",
               "options": { "raw": { "language": "json" } }
             }
           }
@@ -319,7 +332,7 @@
             "url": { "raw": "{{baseUrl}}/api/treinamentos/1", "host": ["{{baseUrl}}"], "path": ["api", "treinamentos", "1"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"titulo\": \"Comandos básicos - Atualizado\",\n  \"descricao\": \"Descrição atualizada do treinamento.\",\n  \"etapa\": 1\n}",
+              "raw": "{\n  \"titulo\": \"Comandos básicos - Atualizado\",\n  \"descricao\": \"Descrição atualizada do treinamento.\",\n  \"etapa\": \"Etapa 1 - Comandos Básicos Atualizados\"\n}",
               "options": { "raw": { "language": "json" } }
             }
           }
@@ -337,17 +350,17 @@
       "name": "📋 Formulários",
       "item": [
         {
-          "name": "Enviar formulário (público)",
+          "name": "Enviar formulário (autenticado)",
           "request": {
-            "auth": { "type": "noauth" },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": { "raw": "{{baseUrl}}/api/formularios", "host": ["{{baseUrl}}"], "path": ["api", "formularios"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"resposta\": \"Gostaria de saber mais sobre o programa de adoção de cães-guia.\"\n}",
+              "raw": "{\n  \"categoria\": \"CEGO\",\n  \"observacao\": \"Gostaria de saber mais sobre o programa de adoção de cães-guia.\"\n}",
               "options": { "raw": { "language": "json" } }
-            }
+            },
+            "description": "Dados do usuário (nome, email, telefone) são obtidos automaticamente do Bearer token. Categorias: CEGO, FAMILIA_ACOLHEDORA, SOCIALIZADORA, DOACAO"
           }
         },
         {
@@ -372,7 +385,7 @@
             "url": { "raw": "{{baseUrl}}/api/formularios/1", "host": ["{{baseUrl}}"], "path": ["api", "formularios", "1"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"resposta\": \"Mensagem atualizada pelo administrador.\"\n}",
+              "raw": "{\n  \"categoria\": \"DOACAO\",\n  \"observacao\": \"Observação atualizada pelo administrador.\"\n}",
               "options": { "raw": { "language": "json" } }
             }
           }

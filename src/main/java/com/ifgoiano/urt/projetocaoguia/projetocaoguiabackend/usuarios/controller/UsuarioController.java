@@ -1,5 +1,6 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.controller;
 
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.AdminRequestDTO;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.LoginResponseDTO;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.UsuarioRequestDTO;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.UsuarioResponseDTO;
@@ -35,6 +36,19 @@ public class UsuarioController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(usuarioService.cadastrar(dto));
+    }
+
+    @PostMapping("/cadastro-admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+            summary = "Cadastrar usuário administrador",
+            description = "Apenas administradores autenticados podem criar novos administradores. Requer Bearer token de um admin."
+    )
+    public ResponseEntity<UsuarioResponseDTO> cadastrarAdmin(
+            @RequestBody AdminRequestDTO dto) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(usuarioService.cadastrarAdmin(dto));
     }
 
     @PostMapping("/login")

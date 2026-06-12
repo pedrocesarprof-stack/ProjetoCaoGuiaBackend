@@ -8,6 +8,31 @@ Formato de versao:
 - `MINOR`: novas funcionalidades compativeis
 - `PATCH`: correcao e ajustes sem quebra
 
+## [0.6.0] - 2026-06-11
+
+### Changed
+
+- Sistema de cadastro de administradores refatorado para usar autenticacao JWT via Bearer token.
+- Apenas admins autenticados podem criar novos admins (nao usa mais token estatico).
+- AdminRequestDTO simplificado: removido campo `tokenAdmin`.
+- Formulario simplificado: dados pessoais (nome, email, telefone) obtidos automaticamente do usuario autenticado.
+- Campo `resposta` renomeado para `observacao` no formulario.
+- FormularioRequestDTO agora possui apenas `categoria` e `observacao`.
+- Envio de formulario requer autenticacao (Bearer token).
+- Campo `telefone` adicionado no cadastro e atualizacao de usuarios.
+
+### Security
+
+- Melhorada seguranca na criacao de admins: endpoint protegido com `@PreAuthorize("hasRole('ADMIN')")`.
+- Dupla validacao: Spring Security + validacao no service layer.
+- Formularios agora exigem usuario autenticado para evitar spam.
+
+### Technical
+
+- AuthenticationFacade integrado no UsuarioService para obter usuario autenticado.
+- Removida dependencia de configuracao `admin.token` no application.properties.
+- FormularioService refatorado para extrair dados do usuario logado automaticamente.
+
 ## [0.5.0] - 2026-06-11
 
 ### Added

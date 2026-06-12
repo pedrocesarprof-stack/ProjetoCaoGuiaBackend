@@ -25,15 +25,29 @@ public class FormularioService {
     private final AuthenticationFacade authenticationFacade;
 
     public FormularioResponseDTO salvarFormulario(FormularioRequestDTO dto) {
-        if (dto.resposta() == null || dto.resposta().isBlank()) {
-            throw new RuntimeException("O conteúdo do formulário não pode estar vazio!");
+        // Validações
+        if (dto.categoria() == null) {
+            throw new RuntimeException("A categoria deve ser informada!");
+        }
+        if (dto.observacao() == null || dto.observacao().isBlank()) {
+            throw new RuntimeException("A observação não pode estar vazia!");
         }
 
         var usuarioLogado = authenticationFacade.getAuthenticatedUserOrNull();
 
+        // Se não houver usuário autenticado, não permite envio
+        if (usuarioLogado == null) {
+            throw new RuntimeException("É necessário estar autenticado para enviar um formulário!");
+        }
+
         Formulario formulario = Formulario.builder()
+                .nome(usuarioLogado.getNome())
+                .email(usuarioLogado.getEmail())
+                .telefone(usuarioLogado.getTelefone())
+                .categoria(dto.categoria())
                 .dataEnvio(LocalDateTime.now())
-                .resposta(dto.resposta().trim())
+                .observacao(dto.observacao().trim())
+                .usuario(usuarioLogado)
                 .criadoPor(usuarioLogado)
                 .atualizadoPor(usuarioLogado)
                 .build();
@@ -57,16 +71,18 @@ public class FormularioService {
     }
 
     public FormularioResponseDTO atualizarResposta(Long id, FormularioRequestDTO dto) {
-        if (dto.resposta() == null || dto.resposta().isBlank()) {
-            throw new RuntimeException("O conteúdo da resposta não pode estar vazio!");
-        }
-
         var usuarioLogado = authenticationFacade.getAuthenticatedUserOrNull();
 
         Formulario formulario = formularioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Formulário", id));
 
-        formulario.setResposta(dto.resposta().trim());
+        if (dto.categoria() != null) {
+            formulario.setCategoria(dto.categoria());
+        }
+        if (dto.observacao() != null && !dto.observacao().isBlank()) {
+            formulario.setObservacao(dto.observacao().trim());
+        }
+
         formulario.setAtualizadoPor(usuarioLogado);
 
         Formulario atualizado = formularioRepository.save(formulario);

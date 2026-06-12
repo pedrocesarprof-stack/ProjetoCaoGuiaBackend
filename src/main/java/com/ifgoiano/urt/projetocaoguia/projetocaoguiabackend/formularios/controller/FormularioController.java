@@ -28,7 +28,10 @@ public class FormularioController {
     private final FormularioService formularioService;
 
     @PostMapping
-    @Operation(summary = "Enviar formulário")
+    @Operation(
+            summary = "Enviar formulário",
+            description = "Usuário autenticado envia formulário. Dados pessoais são obtidos automaticamente do token JWT."
+    )
     public ResponseEntity<FormularioResponseDTO> enviarFormulario(
             @RequestBody FormularioRequestDTO dto) {
 
